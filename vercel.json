@@ -1,0 +1,11 @@
+{
+  "projects": [
+    {
+      "name": "pongal-website",
+      "framework": "vite",
+      "rootDirectory": "sankranthi-village-connect",
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist"
+    }
+  ]
+}
