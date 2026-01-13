@@ -1,11 +1,13 @@
 {
-  "projects": [
+  "version": 2,
+  "builds": [
     {
-      "name": "pongal-website",
-      "framework": "vite",
-      "rootDirectory": "sankranthi-village-connect",
-      "buildCommand": "npm run build",
-      "outputDirectory": "dist"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
     }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
