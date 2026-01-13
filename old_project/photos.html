@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Photos - Sankranthi Festival</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Updated: 2026-01-03 -->
+</head>
+<body>
+  <canvas id="village-background"></canvas>
+
+  <h1 class="page-title">Festival Photos</h1>
+
+  <!-- Basic loading indicator -->
+  <div id="loading-indicator" style="text-align: center; padding: 20px; color: white;">
+    <p>🔄 Loading photos page...</p>
+    <p id="js-status" style="font-size: 12px; color: yellow;">Waiting for JavaScript...</p>
+  </div>
+
+  <!-- Debug Info (temporary) -->
+  <div id="debug-info" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 1000;">
+    Loading...
+  </div>
+
+  <!-- Photo Upload Section for Committee Members -->
+  <div id="photo-upload-section" class="photo-upload-section" style="display: none;">
+    <h2>Share Your Festival Moments</h2>
+    <p>Welcome, Committee Member! You can view and add photos.</p>
+    <div class="upload-form">
+      <input type="file" id="photo-upload" accept="image/*" multiple>
+      <button onclick="uploadPhotos()" class="btn">Share Photos</button>
+    </div>
+  </div>
+
+  <!-- Public Photo Gallery -->
+  <div id="public-gallery" class="photos-container" style="display: none;">
+    <h2 style="text-align: center; color: var(--festival-yellow); margin-bottom: 20px;">Festival Photo Gallery</h2>
+    <div id="photos-grid" class="photos-grid"></div>
+  </div>
+
+  <!-- Fallback content if JavaScript fails -->
+  <noscript>
+    <div style="text-align: center; padding: 50px; color: white;">
+      <h2>⚠️ JavaScript Required</h2>
+      <p>Please enable JavaScript to view the photos section.</p>
+    </div>
+  </noscript>
+
+  <script>
+    // Simple test script
+    console.log("🎯 Simple test script executed!");
+    document.getElementById('js-status').textContent = 'Simple script works! 🎯';
+    document.getElementById('js-status').style.color = 'cyan';
+  </script>
+
+  <script src="photos.js"></script>
+  <script src="village-background.js"></script>
+</body>
+</html>

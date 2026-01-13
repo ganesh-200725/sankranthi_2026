@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sankranthi Festival</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #ffd166;
+            font-size: 48px;
+            margin-bottom: 30px;
+        }
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            width: 200px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Sankranthi Festival 2026</h1>
+
+    <div class="cards">
+        <div class="card" onclick="location.href='games.html'">Games</div>
+        <div class="card" onclick="location.href='rangoli.html'">Rangoli</div>
+        <div class="card" onclick="location.href='schedule.html'">Schedule</div>
+        <div class="card" onclick="location.href='committee.html'">Committee</div>
+        <div class="card" onclick="location.href='photos.html'">Photos</div>
+    </div>
+
+    <script>
+        console.log("Main page loaded successfully");
+    </script>
+</body>
+</html>

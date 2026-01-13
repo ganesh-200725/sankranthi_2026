@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Committee</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1 class="page-title">Committee Members</h1>
+
+  <div class="page-content">
+    <div class="item">Chairman – Mr. Ramesh</div>
+    <div class="item">Coordinator – Ms. Sita</div>
+    <div class="item">Treasurer – Mr. Ravi</div>
+  </div>
+
+  <!-- Committee Login Section -->
+  <div class="committee-login" id="committee-login">
+    <h2>Committee Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="committeeLogin()" class="btn">Login</button>
+  </div>
+
+  <!-- Login Status -->
+  <div id="login-status" style="display: none; text-align: center; margin: 20px 0;">
+    <p style="color: var(--festival-yellow); font-weight: bold;">✅ Logged in as Committee Member</p>
+    <button onclick="committeeLogout()" class="btn" style="background: rgba(255, 107, 53, 0.8);">Logout</button>
+  </div>
+
+  <!-- Admin Panel (Hidden by default) -->
+  <div id="admin-panel" style="display: none;">
+    <h2>Admin Panel</h2>
+
+    <!-- Expenditure Management -->
+    <div class="admin-section">
+      <h3>💰 Expenditure Management</h3>
+      <div id="expenditure-list"></div>
+      <div class="admin-form">
+        <input type="text" id="exp-description" placeholder="Description">
+        <input type="number" id="exp-amount" placeholder="Amount (₹)">
+        <button onclick="addExpenditure()" class="btn">Add Expenditure</button>
+      </div>
+    </div>
+
+    <!-- Schedule Management -->
+    <div class="admin-section">
+      <h3>📅 Edit Schedule</h3>
+      <div id="schedule-editor"></div>
+      <div class="admin-form">
+        <input type="text" id="new-time" placeholder="Time (e.g., 10:00 AM)">
+        <input type="text" id="new-event" placeholder="Event Name">
+        <button onclick="addScheduleItem()" class="btn">Add Event</button>
+      </div>
+    </div>
+
+    <!-- Opinions/Feedback -->
+    <div class="admin-section">
+      <h3>💭 Team Opinions & Feedback</h3>
+      <div id="opinions-list"></div>
+      <div class="admin-form">
+        <input type="text" id="opinion-author" placeholder="Your Name">
+        <textarea id="opinion-text" placeholder="Share your opinion or feedback..."></textarea>
+        <button onclick="addOpinion()" class="btn">Add Opinion</button>
+      </div>
+    </div>
+
+    <!-- User Management -->
+    <div class="admin-section">
+      <h3>👥 User Management</h3>
+      <div id="user-stats">
+        <p>Total Experiences Shared: <span id="total-experiences">0</span></p>
+        <p>Total Photos Uploaded: <span id="total-photos">0</span></p>
+      </div>
+      <button onclick="exportData()" class="btn">Export All Data</button>
+    </div>
+  </div>
+
+  <script src="script.js?v=2"></script>
+</body>
+</html>
