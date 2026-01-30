@@ -1,12 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { query } = require('./database');
+const { supabase } = require('./database');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-const JWT_SECRET = 'sankranthi-secret-2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'sankranthi-secret-2026';
 
 app.use(cors());
 app.use(express.json());
@@ -17,12 +18,6 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    // Fallback for legacy simple auth (headers)
-    const { username, password } = req.headers;
-    if (username === 'hari' && password === '123456') {
-      req.user = { username: 'hari', role: 'committee' };
-      return next();
-    }
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -36,9 +31,13 @@ const authenticateToken = (req, res, next) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const user = await query.get('SELECT * FROM users WHERE username = ?', [username.toLowerCase()]);
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username.toLowerCase())
+      .single();
 
-    if (!user) {
+    if (error || !user) {
       return res.status(401).json({ success: false, error: 'Invalid username or password' });
     }
 
@@ -69,7 +68,11 @@ app.get('/admin/users', authenticateToken, async (req, res) => {
     return res.status(403).json({ error: 'Forbidden' });
   }
   try {
-    const users = await query.all('SELECT id, username, role FROM users');
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, username, role');
+
+    if (error) throw error;
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -84,11 +87,14 @@ app.post('/admin/users', authenticateToken, async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const id = Date.now().toString();
-    await query.run(
-      'INSERT INTO users (id, username, password, role) VALUES (?, ?, ?, ?)',
-      [id, username.toLowerCase(), hashedPassword, role]
-    );
-    res.json({ id, username, role });
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{ id, username: username.toLowerCase(), password: hashedPassword, role }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: 'User already exists or database error' });
   }
@@ -99,7 +105,12 @@ app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
     return res.status(403).json({ error: 'Forbidden' });
   }
   try {
-    await query.run('DELETE FROM users WHERE id = ? OR username = ?', [req.params.id, req.params.id]);
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .or(`id.eq.${req.params.id},username.eq.${req.params.id}`);
+
+    if (error) throw error;
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -109,8 +120,13 @@ app.delete('/admin/users/:id', authenticateToken, async (req, res) => {
 // Expenditures Routes
 app.get('/expenditures', async (req, res) => {
   try {
-    const list = await query.all('SELECT * FROM expenditures ORDER BY date DESC');
-    res.json(list);
+    const { data, error } = await supabase
+      .from('expenditures')
+      .select('*')
+      .order('date', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -120,12 +136,20 @@ app.post('/expenditures', authenticateToken, async (req, res) => {
   const { item, amount, date } = req.body;
   const id = Date.now().toString();
   try {
-    await query.run(
-      'INSERT INTO expenditures (id, item, amount, date, addedBy) VALUES (?, ?, ?, ?, ?)',
-      [id, item, amount, date || new Date().toISOString().split('T')[0], req.user.username]
-    );
-    const added = await query.get('SELECT * FROM expenditures WHERE id = ?', [id]);
-    res.json(added);
+    const { data, error } = await supabase
+      .from('expenditures')
+      .insert([{
+        id,
+        item,
+        amount,
+        date: date || new Date().toISOString().split('T')[0],
+        addedBy: req.user.username
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -133,7 +157,12 @@ app.post('/expenditures', authenticateToken, async (req, res) => {
 
 app.delete('/expenditures/:id', authenticateToken, async (req, res) => {
   try {
-    await query.run('DELETE FROM expenditures WHERE id = ?', [req.params.id]);
+    const { error } = await supabase
+      .from('expenditures')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -143,9 +172,14 @@ app.delete('/expenditures/:id', authenticateToken, async (req, res) => {
 // Suggestions Routes
 app.get('/suggestions', async (req, res) => {
   try {
-    const list = await query.all('SELECT * FROM suggestions ORDER BY date DESC');
-    // Map database fields to frontend fields if necessary
-    const formatted = list.map(s => ({
+    const { data, error } = await supabase
+      .from('suggestions')
+      .select('*')
+      .order('date', { ascending: false });
+
+    if (error) throw error;
+
+    const formatted = data.map(s => ({
       id: s.id,
       name: s.name || 'Anonymous',
       message: s.text,
@@ -162,20 +196,12 @@ app.post('/suggestions', async (req, res) => {
   const id = Date.now().toString();
   const date = new Date().toLocaleString();
   try {
-    await query.run(
-      'INSERT INTO suggestions (id, name, text, date) VALUES (?, ?, ?, ?)',
-      [id, name || 'Anonymous', message, date]
-    );
-    res.json({ id, name, message, date });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const { error } = await supabase
+      .from('suggestions')
+      .insert([{ id, name: name || 'Anonymous', text: message, date }]);
 
-app.delete('/suggestions/:id', authenticateToken, async (req, res) => {
-  try {
-    await query.run('DELETE FROM suggestions WHERE id = ?', [req.params.id]);
-    res.json({ success: true });
+    if (error) throw error;
+    res.json({ id, name, message, date });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -184,10 +210,15 @@ app.delete('/suggestions/:id', authenticateToken, async (req, res) => {
 // Rangoli Routes
 app.get('/rangoli', async (req, res) => {
   try {
-    const list = await query.all('SELECT * FROM rangoli');
-    const formatted = list.map(r => ({
+    const { data, error } = await supabase
+      .from('rangoli')
+      .select('*');
+
+    if (error) throw error;
+
+    const formatted = data.map(r => ({
       ...r,
-      likedBy: JSON.parse(r.likedBy || '[]')
+      likedBy: typeof r.likedBy === 'string' ? JSON.parse(r.likedBy || '[]') : (r.likedBy || [])
     }));
     res.json(formatted);
   } catch (err) {
@@ -199,12 +230,21 @@ app.post('/rangoli', authenticateToken, async (req, res) => {
   const { participantName, participantId, imageUrl } = req.body;
   const id = Date.now().toString();
   try {
-    await query.run(
-      'INSERT INTO rangoli (id, participantName, participantId, imageUrl, likes, likedBy) VALUES (?, ?, ?, ?, 0, ?)',
-      [id, participantName, participantId, imageUrl, '[]']
-    );
-    const added = await query.get('SELECT * FROM rangoli WHERE id = ?', [id]);
-    res.json({ ...added, likedBy: [] });
+    const { data, error } = await supabase
+      .from('rangoli')
+      .insert([{
+        id,
+        participantName,
+        participantId,
+        imageUrl,
+        likes: 0,
+        likedBy: '[]'
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ ...data, likedBy: [] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -216,10 +256,15 @@ app.post('/rangoli/:id/like', async (req, res) => {
   if (!clientId) return res.status(400).json({ error: 'Client ID required' });
 
   try {
-    const entry = await query.get('SELECT * FROM rangoli WHERE id = ?', [id]);
-    if (!entry) return res.status(404).json({ error: 'Not found' });
+    const { data: entry, error: fetchError } = await supabase
+      .from('rangoli')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    let likedBy = JSON.parse(entry.likedBy || '[]');
+    if (fetchError || !entry) return res.status(404).json({ error: 'Not found' });
+
+    let likedBy = typeof entry.likedBy === 'string' ? JSON.parse(entry.likedBy || '[]') : (entry.likedBy || []);
     if (likedBy.includes(clientId)) {
       return res.status(400).json({ error: 'Already liked' });
     }
@@ -227,10 +272,12 @@ app.post('/rangoli/:id/like', async (req, res) => {
     likedBy.push(clientId);
     const newLikes = (entry.likes || 0) + 1;
 
-    await query.run(
-      'UPDATE rangoli SET likes = ?, likedBy = ? WHERE id = ?',
-      [newLikes, JSON.stringify(likedBy), id]
-    );
+    const { error: updateError } = await supabase
+      .from('rangoli')
+      .update({ likes: newLikes, likedBy: JSON.stringify(likedBy) })
+      .eq('id', id);
+
+    if (updateError) throw updateError;
 
     res.json({ success: true, likes: newLikes, likedBy });
   } catch (err) {
@@ -240,7 +287,12 @@ app.post('/rangoli/:id/like', async (req, res) => {
 
 app.delete('/rangoli/:id', authenticateToken, async (req, res) => {
   try {
-    await query.run('DELETE FROM rangoli WHERE id = ?', [req.params.id]);
+    const { error } = await supabase
+      .from('rangoli')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -250,10 +302,15 @@ app.delete('/rangoli/:id', authenticateToken, async (req, res) => {
 // Dance Teams Routes
 app.get('/dance-teams', async (req, res) => {
   try {
-    const list = await query.all('SELECT * FROM dance_teams');
-    const formatted = list.map(t => ({
+    const { data, error } = await supabase
+      .from('dance_teams')
+      .select('*');
+
+    if (error) throw error;
+
+    const formatted = data.map(t => ({
       ...t,
-      members: JSON.parse(t.members || '[]')
+      members: typeof t.members === 'string' ? JSON.parse(t.members || '[]') : (t.members || [])
     }));
     res.json(formatted);
   } catch (err) {
@@ -265,12 +322,14 @@ app.post('/dance-teams', async (req, res) => {
   const { name, members } = req.body;
   const id = Date.now().toString();
   try {
-    await query.run(
-      'INSERT INTO dance_teams (id, name, members, timeSlot) VALUES (?, ?, ?, ?)',
-      [id, name, JSON.stringify(members || []), null]
-    );
-    const added = await query.get('SELECT * FROM dance_teams WHERE id = ?', [id]);
-    res.json({ ...added, members: JSON.parse(added.members) });
+    const { data, error } = await supabase
+      .from('dance_teams')
+      .insert([{ id, name, members: JSON.stringify(members || []), timeSlot: null }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ ...data, members: typeof data.members === 'string' ? JSON.parse(data.members) : data.members });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -279,7 +338,12 @@ app.post('/dance-teams', async (req, res) => {
 app.put('/dance-teams/:id', authenticateToken, async (req, res) => {
   const { timeSlot } = req.body;
   try {
-    await query.run('UPDATE dance_teams SET timeSlot = ? WHERE id = ?', [timeSlot, req.params.id]);
+    const { error } = await supabase
+      .from('dance_teams')
+      .update({ timeSlot })
+      .eq('id', req.params.id);
+
+    if (error) throw error;
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -288,7 +352,12 @@ app.put('/dance-teams/:id', authenticateToken, async (req, res) => {
 
 app.delete('/dance-teams/:id', authenticateToken, async (req, res) => {
   try {
-    await query.run('DELETE FROM dance_teams WHERE id = ?', [req.params.id]);
+    const { error } = await supabase
+      .from('dance_teams')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -300,11 +369,14 @@ app.get('/scores/:type', authenticateToken, async (req, res) => {
   const { type } = req.params;
   const judgeName = req.user.username;
   try {
-    const list = await query.all(
-      'SELECT targetId, score FROM scores WHERE type = ? AND judgeName = ?',
-      [type, judgeName]
-    );
-    res.json(list);
+    const { data, error } = await supabase
+      .from('scores')
+      .select('targetId, score')
+      .eq('type', type)
+      .eq('judgeName', judgeName);
+
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -316,21 +388,25 @@ app.post('/scores', authenticateToken, async (req, res) => {
 
   try {
     for (const item of scores) {
-      const existing = await query.get(
-        'SELECT * FROM scores WHERE type = ? AND targetId = ? AND judgeName = ?',
-        [type, item.targetId, judgeName]
-      );
+      const { data: existing } = await supabase
+        .from('scores')
+        .select('*')
+        .eq('type', type)
+        .eq('targetId', item.targetId)
+        .eq('judgeName', judgeName)
+        .single();
 
       if (existing) {
-        await query.run(
-          'UPDATE scores SET score = ? WHERE type = ? AND targetId = ? AND judgeName = ?',
-          [item.score, type, item.targetId, judgeName]
-        );
+        await supabase
+          .from('scores')
+          .update({ score: item.score })
+          .eq('type', type)
+          .eq('targetId', item.targetId)
+          .eq('judgeName', judgeName);
       } else {
-        await query.run(
-          'INSERT INTO scores (type, targetId, judgeName, score) VALUES (?, ?, ?, ?)',
-          [type, item.targetId, judgeName, item.score]
-        );
+        await supabase
+          .from('scores')
+          .insert([{ type, targetId: item.targetId, judgeName, score: item.score }]);
       }
     }
     res.json({ success: true });
@@ -342,8 +418,11 @@ app.post('/scores', authenticateToken, async (req, res) => {
 // Games/Events Routes
 app.get('/games', async (req, res) => {
   try {
-    const events = await query.all('SELECT * FROM events');
-    res.json(events);
+    const { data, error } = await supabase
+      .from('events')
+      .select('*');
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -353,12 +432,24 @@ app.post('/games', authenticateToken, async (req, res) => {
   const { name, emoji, date, time, location, participants, description, type } = req.body;
   const id = Date.now().toString();
   try {
-    await query.run(
-      'INSERT INTO events (id, name, emoji, date, time, location, participants, description, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [id, name, emoji, date || 'January 14, 2026', time, location, participants, description, type || 'game']
-    );
-    const newEvent = await query.get('SELECT * FROM events WHERE id = ?', [id]);
-    res.json(newEvent);
+    const { data, error } = await supabase
+      .from('events')
+      .insert([{
+        id,
+        name,
+        emoji,
+        date: date || 'January 14, 2026',
+        time,
+        location,
+        participants,
+        description,
+        type: type || 'game'
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -367,12 +458,16 @@ app.post('/games', authenticateToken, async (req, res) => {
 app.put('/games/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
-  const fields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
-  const values = [...Object.values(updates), id];
   try {
-    await query.run(`UPDATE events SET ${fields} WHERE id = ?`, values);
-    const updated = await query.get('SELECT * FROM events WHERE id = ?', [id]);
-    res.json(updated);
+    const { data, error } = await supabase
+      .from('events')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -381,7 +476,11 @@ app.put('/games/:id', authenticateToken, async (req, res) => {
 app.delete('/games/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
-    await query.run('DELETE FROM events WHERE id = ?', [id]);
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -389,5 +488,5 @@ app.delete('/games/:id', authenticateToken, async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`);
+  console.log(`Backend server running on port ${PORT} with Supabase`);
 });
