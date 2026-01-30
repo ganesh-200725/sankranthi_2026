@@ -1,0 +1,51 @@
+[
+  {
+    "item": "food",
+    "amount": 3000,
+    "date": "2026-01-13",
+    "id": "1768302178265",
+    "addedBy": "ganesh"
+  },
+  {
+    "item": "food",
+    "amount": 2000,
+    "date": "2026-01-13",
+    "id": "1768302035525",
+    "addedBy": "jana"
+  },
+  {
+    "id": "1",
+    "item": "Stage Decoration",
+    "amount": 15000,
+    "date": "2026-01-10",
+    "addedBy": "Lakshmi Devi"
+  },
+  {
+    "id": "2",
+    "item": "Sound System Rental",
+    "amount": 8000,
+    "date": "2026-01-10",
+    "addedBy": "Lakshmi Devi"
+  },
+  {
+    "id": "3",
+    "item": "Prizes for Games",
+    "amount": 12000,
+    "date": "2026-01-11",
+    "addedBy": "Lakshmi Devi"
+  },
+  {
+    "id": "4",
+    "item": "Food & Refreshments",
+    "amount": 25000,
+    "date": "2026-01-12",
+    "addedBy": "Lakshmi Devi"
+  },
+  {
+    "id": "5",
+    "item": "Rangoli Materials",
+    "amount": 3000,
+    "date": "2026-01-08",
+    "addedBy": "Lakshmi Devi"
+  }
+]

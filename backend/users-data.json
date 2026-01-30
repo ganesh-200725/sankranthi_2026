@@ -1,0 +1,47 @@
+[
+  {
+    "username": "committee1",
+    "password": "sankranthi2026",
+    "role": "committee"
+  },
+  {
+    "username": "ganesh",
+    "password": "123456",
+    "role": "committee"
+  },
+  {
+    "username": "events",
+    "password": "events2026",
+    "role": "event_manager"
+  },
+  {
+    "username": "judge1",
+    "password": "judge2026",
+    "role": "judge"
+  },
+  {
+    "username": "judge2",
+    "password": "judge2026",
+    "role": "judge"
+  },
+  {
+    "username": "hari",
+    "password": "123456",
+    "role": "committee"
+  },
+  {
+    "username": "jana",
+    "password": "jana123",
+    "role": "financial_manager"
+  },
+  {
+    "username": "vinay",
+    "password": "vinnu123",
+    "role": "rangoli_manager"
+  },
+  {
+    "username": "sai",
+    "password": "123456",
+    "role": "dance_manager"
+  }
+]

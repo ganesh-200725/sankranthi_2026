@@ -1,2 +1,6 @@
-*.json
 node_modules/
+*.db
+*.log
+# Don't ignore package.json!
+# If you want to ignore data files:
+# *-data.json

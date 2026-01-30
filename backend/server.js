@@ -4,7 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { query } = require('./database');
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
 const JWT_SECRET = 'sankranthi-secret-2026';
 
 app.use(cors());

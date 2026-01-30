@@ -1,0 +1,33 @@
+[
+  {
+    "id": "1",
+    "name": "Village Stars",
+    "members": [
+      "Priya",
+      "Kavya",
+      "Anjali",
+      "Lakshmi"
+    ],
+    "timeSlot": "7:30 PM"
+  },
+  {
+    "id": "2",
+    "name": "Dancing Queens",
+    "members": [
+      "Radha",
+      "Sita",
+      "Geetha",
+      "Padma",
+      "Saritha"
+    ],
+    "timeSlot": "7:50 PM"
+  },
+  {
+    "name": "sundars",
+    "members": [
+      "team sai"
+    ],
+    "id": "1768298967665",
+    "timeSlot": "8:00 PM"
+  }
+]

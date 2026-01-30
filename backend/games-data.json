@@ -1,0 +1,85 @@
+[
+  {
+    "id": "1",
+    "name": "Colour Game",
+    "emoji": "🎨",
+    "date": "January 14, 2026",
+    "location": "Main Street Devada",
+    "participants": "All ages",
+    "description": "Fun colour matching game for everyone."
+  },
+  {
+    "id": "2",
+    "name": "Blast the Balloon",
+    "emoji": "🎈",
+    "date": "January 14, 2026",
+    "location": "Main Street Devada",
+    "participants": "Kids & Youth",
+    "description": "Exciting balloon blasting competition!"
+  },
+  {
+    "id": "3",
+    "name": "Carry the Balloon",
+    "emoji": "🏃",
+    "date": "January 14, 2026",
+    "location": "Main Street Devada",
+    "participants": "Pairs",
+    "description": "Balance the balloon and race to the finish line."
+  },
+  {
+    "id": "4",
+    "name": "Housie",
+    "emoji": "🎟️",
+    "date": "January 14, 2026",
+    "location": "Main Street Devada",
+    "participants": "Everyone",
+    "description": "Community Housie game with exciting prizes."
+  },
+  {
+    "id": "5",
+    "name": "Tug of War",
+    "emoji": "💪",
+    "date": "January 15, 2026",
+    "image": "/images/tug_of_war.png",
+    "location": "Main Street Devada",
+    "participants": "Teams",
+    "description": "Test your strength in the ultimate tug of war battle."
+  },
+  {
+    "id": "6",
+    "name": "Pick the Bottle",
+    "emoji": "🍾",
+    "date": "January 15, 2026",
+    "location": "Main Street Devada",
+    "participants": "Individual",
+    "description": "Try your luck to pick the bottle!"
+  },
+  {
+    "id": "7",
+    "name": "Vutti (Utlou)",
+    "emoji": "🏺",
+    "date": "January 15, 2026",
+    "location": "Main Street Devada",
+    "participants": "Youth",
+    "description": "Traditional pot breaking challenge."
+  },
+  {
+    "id": "8",
+    "name": "Tasks Game",
+    "emoji": "📋",
+    "date": "January 15, 2026",
+    "location": "Main Street Devada",
+    "participants": "Selected",
+    "description": "Complete the funny and challenging tasks given."
+  },
+  {
+    "id": "9",
+    "name": "Musical Chair",
+    "emoji": "🪑",
+    "date": "January 15, 2026",
+    "image": "/images/musical_chairs.png",
+    "location": "Main Street Devada",
+    "participants": "Women & Kids",
+    "description": "Classic musical chairs game - be the last one sitting!"
+  }
+]
