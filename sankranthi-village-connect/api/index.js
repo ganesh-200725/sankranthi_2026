@@ -6,7 +6,17 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const JWT_SECRET = process.env.JWT_SECRET || 'sankranthi-secret-2026';
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+// Support both VITE_ and standard env names for convenience
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+    console.error("CRITICAL: Missing Supabase URL or Key in Environment Variables");
+}
+
+const supabase = createClient(supabaseUrl || "", supabaseKey || "");
+
 
 app.use(cors());
 app.use(express.json());
