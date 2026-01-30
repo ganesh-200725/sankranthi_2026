@@ -26,8 +26,10 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.post('/api/login', async (req, res) => {
+
     const { username, password } = req.body;
     try {
         const { data: user, error } = await supabase
