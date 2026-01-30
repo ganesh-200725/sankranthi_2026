@@ -1,0 +1,13 @@
+node_modules/
+.env
+old_project/
+*.mp4
+*.jpeg
+*.png
+*.jpg
+dist/
+build/
+.vscode/
+*.db
+*.log
+.DS_Store
