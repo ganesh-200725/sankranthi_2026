@@ -17,7 +17,8 @@ import { ScheduleManageTab } from './ScheduleManageTab';
 import { SuggestionsTab } from './SuggestionsTab';
 import ManageTeamTab from './ManageTeamTab';
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from '@/config/api';
+
 
 export function CommitteeDashboard() {
   const { user, hasRole, isAuthenticated } = useAuth();

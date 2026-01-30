@@ -18,7 +18,8 @@ interface Game {
 }
 
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from '@/config/api';
+
 
 
 export default function EditGames() {

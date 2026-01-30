@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Plus, Trash2, UserPlus, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from '@/config/api';
+
 
 interface User {
     username: string;

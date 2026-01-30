@@ -12,7 +12,8 @@ interface Suggestion {
   date: string;
 }
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from '@/config/api';
+
 
 export function SuggestionsTab() {
   const { user } = useAuth();

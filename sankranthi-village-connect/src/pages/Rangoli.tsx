@@ -16,7 +16,8 @@ interface RangoliEntry {
   likedBy?: string[];
 }
 
-const API_URL = 'http://localhost:5000';
+import { API_URL } from '@/config/api';
+
 
 // Helper to get or create a unique client ID
 const getClientId = () => {
